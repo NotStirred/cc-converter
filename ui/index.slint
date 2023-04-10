@@ -1,0 +1,204 @@
+import { Button } from "std-widgets.slint";
+component Input {
+    in-out property empty_text <=> txt.text;
+
+    public function get-text() -> string {
+        return input.text;
+    }
+    public function set-text(text: string) {
+        input.text = text;
+    }
+
+    Rectangle {
+        x: 0;
+        y: 0;
+        border-radius: 2px;
+        background: #bbbbbb;
+    }
+
+    txt := Text {
+        x: 5px;
+        vertical-alignment: center;
+
+        font-size: 14px;
+
+        color: #777777;
+    }
+
+    input := TextInput {
+        x: 5px;
+        vertical-alignment: center;
+
+        font-size: 14px;
+    }
+
+    states [
+        active when input.text != "": {
+            txt.opacity: 0;
+        }
+    ]
+}
+
+component LoadingBar {
+    in property <string> text;
+    in property <float> fill-percentage;
+
+    bg-rectangle := Rectangle {
+        border-radius: 3px;
+        height: 25px;
+        background: #bbbbbb;
+    }
+
+    fill-rectangle := Rectangle {
+        x: 0;
+        border-radius: 3px;
+        height: 25px;
+        width: bg-rectangle.width * fill-percentage;
+
+        background: #4f92b1;
+    }
+
+    Text {
+        text: text;
+        color: #222222;
+    }
+}
+
+import { ComboBox } from "std-widgets.slint";
+export component MainWindow inherits Window {
+    title: "converter.rs";
+
+    callback open-folder(string, string) -> string;
+
+    callback convert();
+
+    in property <string> tasks-queue-text: "Tasks Queue: 0/0";
+    in property <percent> tasks-queue-percentage: 0%;
+
+    in property <string> convert-queue-text: "Convert Queue: 0/0";
+    in property <percent> convert-queue-percentage: 0%;
+
+    in property <string> write-queue-text: "Write Queue: 0/0";
+    in property <percent> write-queue-percentage: 0%;
+
+    public function set_converter_options(default: string, options: [string]) {
+        converter-combo.current-value = default;
+        converter-combo.model = options;
+    }
+    public function get_converter_option() -> string {
+        return converter-combo.current-value;
+    }
+
+    public function get-src-path2() -> string {
+        return src-input.get-text();
+    }
+
+    public function get-dst-path2() -> string {
+        return dst-input.get-text();
+    }
+
+    preferred-width: 720px;
+    preferred-height: 215px;
+    min-width: 400px;
+    min-height: 215px;
+
+    GridLayout {
+        x: 5px;
+        y: 5px;
+        spacing: 5px;
+        padding-right: 10px;
+        Row {
+            Text {
+                text: "Source:";
+                min-width: 100px;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+            }
+            src-input := Input {
+                height: 25px;
+                empty-text: "Source world path";
+            }
+            Button {
+                text: "...";
+                height: 25px;
+                width: 25px;
+                clicked => {
+                    src-input.set-text(root.open-folder("Select the Source world folder", get-src-path2()));
+                }
+            }
+        }
+        Row {
+            Text {
+                text: "Destination:";
+                max-width: 100px;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+            }
+            dst-input := Input {
+                min-width: 100px;
+                height: 25px;
+                empty-text: "Destination world path";
+            }
+            Button {
+                text: "...";
+                height: 25px;
+                width: 25px;
+                clicked => {
+                    dst-input.set-text(root.open-folder("Select the Destination world folder", get-dst-path2()));
+                }
+            }
+        }
+        Row {
+            LoadingBar {
+                text: tasks-queue-text;
+                colspan: 3;
+                height: 25px;
+                fill-percentage: tasks-queue-percentage;
+            }
+        }
+        Row {
+            LoadingBar {
+                text: convert-queue-text;
+                colspan: 3;
+                height: 25px;
+                fill-percentage: convert-queue-percentage;
+            }
+        }
+        Row {
+            LoadingBar {
+                text: write-queue-text;
+                colspan: 3;
+                height: 25px;
+                fill-percentage: write-queue-percentage;
+            }
+        }
+        Row {
+            Text {
+                colspan: 3;
+                text: "WARNING: USE ON MODDED WORLDS AT YOUR OWN RISK! THIS IS NOT DESIGNED TO HANDLE THEM!";
+                color: red;
+                height: 25px;
+                vertical-alignment: center;
+                min-width: 100px;
+            }
+        }
+        Row {
+            Text {
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                text: "Converter:";
+            }
+            converter-combo := ComboBox {
+                colspan: 1;
+                height: 25px;                
+            }
+            Button {
+                text: "Convert";
+                height: 25px;
+                clicked => {
+                    convert();
+                }
+            }
+        }
+    }
+}

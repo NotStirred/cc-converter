@@ -1,0 +1,16 @@
+[package]
+name = "converter-gui"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+slint = { version = "1.0", features = [ "backend-qt", ] }
+rfd = "0.11.3"
+cc-converter = { git = "https://github.com/NotStirred/cc-converter.git", branch = "stable" }
+phf = { version = "0.11.1", features = ["macros"] }
+
+[build-dependencies]
+slint-build = "1.0"
