@@ -22,14 +22,24 @@ jobs:
           - { os: "windows-2019",  target: "x86_64-pc-windows-msvc",    cross: false, }
 
           - { os: "ubuntu-latest", target: "aarch64-unknown-linux-gnu", cross: true,  }
-          - { os: "ubuntu-latest", target: "x86_64-apple-darwin",       cross: true,  }
-          - { os: "ubuntu-latest", target: "x86_64-pc-windows-msvc",    cross: true,  }
 
     steps:
     - name: Checkout
       uses: actions/checkout@v3
       with:
         submodules: recursive
+
+    - name: Cache Qt
+      id: cache-qt
+      uses: actions/cache@v2
+      with:
+        path: ~/work/cargo-ui/Qt
+        key: ${{ runner.os }}-${{ github.job }}-Qt
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.15.2
+        cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
     - name: Cache
       uses: actions/cache@v3.2.4
@@ -44,7 +54,7 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: build
-        args: --release --target=${{ matrix.info.target }}
+        args: --verbose --no-default-features --features slint-backend-qt --release --target=${{ matrix.info.target }}
         use-cross: ${{ matrix.info.cross }}
 
     - name: Archive production artifacts
