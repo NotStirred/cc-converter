@@ -1,0 +1,4 @@
+[submodule "lib-cc-converter"]
+	path = crates/lib-cc-converter
+	branch = stable
+	url = https://github.com/NotStirred/lib-cc-converter.git

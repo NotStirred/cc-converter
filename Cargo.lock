@@ -307,16 +307,12 @@ dependencies = [
 [[package]]
 name = "cc-converter"
 version = "0.1.0"
-source = "git+https://github.com/NotStirred/cc-converter.git?branch=stable#d1ad74234ee2b2d7c6c501db3a2538327b5be30a"
 dependencies = [
- "byteorder",
- "flate2",
- "lazy_static",
- "multiqueue",
- "once_cell",
- "pathdiff",
- "quartz_nbt",
- "regex",
+ "lib-cc-converter",
+ "phf",
+ "rfd",
+ "slint",
+ "slint-build",
 ]
 
 [[package]]
@@ -501,17 +497,6 @@ name = "convert_case"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
-
-[[package]]
-name = "converter-gui"
-version = "0.1.0"
-dependencies = [
- "cc-converter",
- "phf",
- "rfd",
- "slint",
- "slint-build",
-]
 
 [[package]]
 name = "copypasta"
@@ -1739,6 +1724,20 @@ name = "lebe"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03087c2bad5e1034e8cace5926dec053fb3790248370865f5117a7d0213354c8"
+
+[[package]]
+name = "lib-cc-converter"
+version = "0.1.0"
+dependencies = [
+ "byteorder",
+ "flate2",
+ "lazy_static",
+ "multiqueue",
+ "once_cell",
+ "pathdiff",
+ "quartz_nbt",
+ "regex",
+]
 
 [[package]]
 name = "libc"

@@ -1,4 +1,4 @@
-use cc_converter::{anvil2cc, Anvil2CCConfig};
+use lib_cc_converter::{anvil2cc, Anvil2CCConfig};
 use phf::phf_map;
 use slint::{invoke_from_event_loop, SharedString, VecModel};
 use std::{
