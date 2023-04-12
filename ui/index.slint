@@ -121,7 +121,6 @@ export component MainWindow inherits Window {
             Button {
                 text: "...";
                 height: 25px;
-                width: 25px;
                 clicked => {
                     src-input.set-text(root.open-folder("Select the Source world folder", get-src-path2()));
                 }
@@ -142,7 +141,6 @@ export component MainWindow inherits Window {
             Button {
                 text: "...";
                 height: 25px;
-                width: 25px;
                 clicked => {
                     dst-input.set-text(root.open-folder("Select the Destination world folder", get-dst-path2()));
                 }
@@ -195,6 +193,7 @@ export component MainWindow inherits Window {
             Button {
                 text: "Convert";
                 height: 25px;
+                width: 50px;
                 clicked => {
                     convert();
                 }
