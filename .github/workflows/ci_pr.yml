@@ -29,6 +29,9 @@ jobs:
       with:
         submodules: recursive
 
+    - run: sudo apt-get install -y libgtk-3-dev
+      if: matrix.info.os == 'ubuntu-latest'
+
     - name: Cache Qt
       id: cache-qt
       uses: actions/cache@v2
@@ -54,7 +57,7 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: build
-        args: --verbose --no-default-features --features slint-backend-qt --release --target=${{ matrix.info.target }}
+        args: --release --target=${{ matrix.info.target }}
         use-cross: ${{ matrix.info.cross }}
 
     - name: Archive production artifacts

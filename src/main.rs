@@ -18,7 +18,7 @@ static VALID_CONVERTERS: phf::Map<&'static str, ConverterRegistry> = phf_map! {
 };
 
 fn open_folder(title: &str) -> Option<SharedString> {
-    if let Some(path) = rfd::FileDialog::new().set_title(title).pick_file() {
+    if let Some(path) = rfd::FileDialog::new().set_title(title).pick_folder() {
         return Some(path.to_string_lossy().to_string().into());
     }
     None
