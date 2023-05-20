@@ -4,6 +4,7 @@ use slint::{invoke_from_event_loop, SharedString, VecModel};
 use std::{
     path::PathBuf,
     sync::{atomic::Ordering, Arc},
+    time::Instant,
 };
 
 slint::include_modules!();
@@ -38,6 +39,27 @@ fn set_converter_state(
     ui.set_write_queue_text(format!("Write Queue: {}/{}", write_current, write_max).into());
 }
 
+fn set_converter_finished(
+    ui: MainWindow,
+    time_taken: f64,
+    (tasks_current, tasks_max): (i32, i32),
+    (convert_current, convert_max): (i32, i32),
+    (write_current, write_max): (i32, i32),
+) {
+    ui.set_tasks_queue_percentage(100f32);
+    ui.set_tasks_queue_text(
+        format!(
+            "Done in {}s | Queue: {}/{}",
+            time_taken, tasks_current, tasks_max
+        )
+        .into(),
+    );
+    ui.set_convert_queue_percentage((convert_current as f32 / convert_max as f32) * 100f32);
+    ui.set_convert_queue_text(format!("Convert Queue: {}/{}", convert_current, convert_max).into());
+    ui.set_write_queue_percentage((write_current as f32 / write_max as f32) * 100f32);
+    ui.set_write_queue_text(format!("Write Queue: {}/{}", write_current, write_max).into());
+}
+
 fn main() -> Result<(), slint::PlatformError> {
     let ui = Arc::new(MainWindow::new()?);
 
@@ -62,6 +84,8 @@ fn main() -> Result<(), slint::PlatformError> {
         std::thread::spawn(move || {
             println!("{}", src_path.display());
 
+            let start = Instant::now();
+
             let waiter = anvil2cc(
                 &src_path,
                 &dst_path,
@@ -83,17 +107,24 @@ fn main() -> Result<(), slint::PlatformError> {
                     set_converter_state(
                         ui,
                         (val, val), // TODO: actually count the tasks for the maximum
-                        (waiter.convert_queue_fill.load(Ordering::Relaxed) as i32, 64),
-                        (waiter.write_queue_fill.load(Ordering::Relaxed) as i32, 64),
+                        (
+                            waiter.convert_queue_fill.load(Ordering::Relaxed) as i32,
+                            1024,
+                        ),
+                        (waiter.write_queue_fill.load(Ordering::Relaxed) as i32, 1024),
                     );
                 })
                 .unwrap();
+                std::thread::sleep(std::time::Duration::from_millis(100));
             }
+
+            let time_taken = start.elapsed().as_secs_f64();
 
             // Run once after all threads are finished to update the UI with the final values
             invoke_from_event_loop(move || {
-                set_converter_state(
+                set_converter_finished(
                     ui_weak.unwrap(),
+                    time_taken,
                     (
                         waiter.tasks_sent.load(Ordering::Relaxed) as i32,
                         waiter.tasks_sent.load(Ordering::Relaxed) as i32,
@@ -117,7 +148,9 @@ fn main() -> Result<(), slint::PlatformError> {
     );
 
     ui.show()?;
+    println!("Starting...");
     slint::run_event_loop()?;
+    println!("Stopping...");
     ui.hide()?;
     Ok(())
 }
