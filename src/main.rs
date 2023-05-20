@@ -91,6 +91,7 @@ fn main() -> Result<(), slint::PlatformError> {
                 &dst_path,
                 Anvil2CCConfig {
                     fix_missing_tile_entities: true,
+                    ctx: Default::default(),
                 },
             )
             .unwrap();
